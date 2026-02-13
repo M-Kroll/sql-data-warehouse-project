@@ -127,8 +127,6 @@ It is modeled as a star schema with a central sales fact table and supporting di
 
 This schema is optimized for aggregation, KPI computation, and BI tools such as Power BI.
 
----
-
 ### Analytics Layer (SQL KPI Queries)
 
 After the Gold layer is implemented, business-focused KPI queries are developed directly on top of the star schema.
