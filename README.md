@@ -35,7 +35,7 @@ data-warehouse-project/
 │   ├── data_flow.png                   # ETL and data flow documentation
 │   ├── data_models.png                 # Star schema / dimensional model
 │   ├── data_catalog.md                 # Dataset catalog with column descriptions
-│   ├── naming-conventions.md           # Naming rules for schemas, tables and columns
+│   ├── naming_conventions.md           # Naming rules for schemas, tables and columns
 │
 ├── scripts/                            # SQL scripts for ETL and transformations
 │   ├── bronze/                         # Scripts for extracting and loading raw data
@@ -215,9 +215,10 @@ cd sql-data-warehouse-project
 
 ## Acknowledgements
 
-This project was inspired by the Data Warehouse tutorials from the YouTube channel "Data with Baara", which demonstrate a structured ETL workflow, Medallion architecture, and star schema modeling. 
+This project was inspired by the Data Warehouse tutorials from the YouTube channel "Data with Baara".
+The repository structure and documentation approach follow similar best practices (Bronze/Silver/Gold layers, ETL workflow, star schema modeling).
 
-All data, SQL scripts, and transformations in this repository were implemented independently using the AdventureWorks dataset.
+All datasets, SQL scripts, and transformations in this repository were implemented independently using the Microsoft AdventureWorks sample database.
 
 ---
 
