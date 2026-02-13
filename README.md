@@ -1,8 +1,12 @@
 # SQL Data Warehouse Project
 
+![Data Warehouse Architecture](docs/data_architecture.png)
+
+*Architecture of layered data warehouse after Medallion approach (Bronze, Silver, Gold)*
+
 ## Description
 
-This project implements a structured, SQL Server–based data warehouse and analytics solution using the Microsoft AdventureWorks sample database as a realistic business data source.
+This project implements a structured, SQL Server–based data warehouse and analytics solution using a subset of the Microsoft AdventureWorks sample database as a realistic business data source.
 
 The goal is to demonstrate end-to-end data engineering workflows including staging raw source data, applying cleansing and transformation logic, and building a star schema optimized for reporting and KPI-based analytics. The project follows a layered warehouse architecture inspired by the Medallion approach (Bronze, Silver, Gold).
 
@@ -27,9 +31,9 @@ data-warehouse-project/
 ├── datasets/                           # Raw datasets used for the project 
 │
 ├── docs/                               # Documentation, architecture and modeling
-│   ├── data_architecture.drawio        # Bronze/Silver/Gold architecture diagram
-│   ├── data_flow.drawio                # ETL and data flow documentation
-│   ├── data_models.drawio              # Star schema / dimensional model
+│   ├── data_architecture.pnd           # Bronze/Silver/Gold architecture diagram
+│   ├── data_flow.png                   # ETL and data flow documentation
+│   ├── data_models.png                 # Star schema / dimensional model
 │   ├── data_catalog.md                 # Dataset catalog with column descriptions
 │   ├── naming-conventions.md           # Naming rules for schemas, tables and columns
 │
@@ -66,7 +70,22 @@ This layered approach improves traceability and allows transformations to remain
 
 ### Data Sources
 
-The project is based on the official Microsoft AdventureWorks dataset, which represents a fictional manufacturing and sales company. It contains realistic ERP-like structures including customers, products, orders, and sales transactions.
+The project is based on a curated subset of the official [Microsoft AdventureWorks sample database (AdventureWorks2022.bak)](https://learn.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver17&tabs=ssms).
+The subset was selected to represent a minimal but realistic sales and product domain for building a star schema.
+
+Extracted source tables include:
+
+- `Sales.SalesOrderHeader`
+- `Sales.SalesOrderDetail`
+- `Sales.Customer`
+- `Person.Person`
+- `Production.Product`
+- `Production.ProductSubcategory`
+- `Production.ProductCategory`
+- `Sales.SalesTerritory`
+
+These tables were exported individually as CSV files and serve as the raw input for the Bronze layer.
+
 
 ### Bronze Layer (Raw Ingestion)
 
@@ -85,38 +104,46 @@ The Silver layer transforms Bronze data into a consistent and usable format.
 
 Typical transformations include:
 
-- Null handling and missing value resolution  
-- Standardization of naming and formats  
-- Data type normalization  
-- Deduplication logic  
+- Data Cleansing
+- Data Standardization
+- Data Normalization
+- Derived Columns
+- Data Enrichment 
 
 This layer represents the first integrated and quality-controlled dataset.
 
 
-### Gold Layer (Dimensional Modeling)
+#### Gold Layer (Dimensional Modeling)
 
-The Gold layer contains the final business-ready data model.
+The Gold layer contains the final business-ready dimensional model for analytics and reporting.
 
-It is modeled using a star schema, consisting of:
+It is modeled as a star schema with a central sales fact table and supporting dimensions, including:
 
-- Fact tables (e.g. sales transactions, order metrics)
-- Dimension tables (e.g. customers, products, dates)
+- `fact_sales` (sales transactions based on `Sales.SalesOrderHeader` + `Sales.SalesOrderDetail`)
+- `dim_customer` (customer master data based on `Sales.Customer` + `Person.Person`)
+- `dim_product` (product hierarchy based on `Production.Product`, `Production.ProductSubcategory`, `Production.ProductCategory`)
+- `dim_territory` (sales region data based on `Sales.SalesTerritory`)
+- `dim_date` (calendar dimension derived from `OrderDate`)
 
-This schema is optimized for reporting, aggregation, and KPI computation.
+This schema is optimized for aggregation, KPI computation, and BI tools such as Power BI.
+
+---
 
 ### Analytics Layer (SQL KPI Queries)
 
-Once the Gold layer is stable, business-focused KPI queries are built directly on top of the star schema.
+After the Gold layer is implemented, business-focused KPI queries are developed directly on top of the star schema.
 
-This includes metrics such as:
+Planned analytics include:
 
-- Revenue trends
-- Customer segmentation performance
-- Product profitability
-- Sales growth and seasonal patterns
-- Order volume and conversion metrics
+- Revenue and sales trends over time
+- Order volume and average order value (AOV)
+- Top customers and customer contribution to revenue
+- Product performance by category and subcategory
+- Territory-based sales performance and growth rates
+- Seasonality analysis based on order date patterns
 
-These queries act as the foundation for reporting and BI dashboards.
+These KPI queries serve as the foundation for reporting and dashboarding.
+
 
 ---
 
@@ -131,6 +158,7 @@ Optional extensions may include:
 
 - Power BI (dashboarding)
 - Python (automation, testing, ingestion scripting)
+- Python (Supervised Machine Learning Analysis)
 
 ---
 
@@ -176,15 +204,22 @@ Planned next steps:
 git clone https://github.com/M-Kroll/sql-data-warehouse-project
 cd sql-data-warehouse-project
 ```
-3. Import datasets
-- [AdventureWorks Sample Database (Microsoft Documentation)](https://learn.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver17&tabs=ssms)
-4. Run SQL scripts in order:
+
+3. Run SQL scripts in order:
 - scripts/bronze/
 - scripts/silver/
 - scripts/gold/
 
-5. Execute KPI queries:
+4. Execute KPI queries:
 - scripts/analytics/
+
+---
+
+## Acknowledgements
+
+This project was inspired by the Data Warehouse tutorials from the YouTube channel "Data with Baara", which demonstrate a structured ETL workflow, Medallion architecture, and star schema modeling. 
+
+All data, SQL scripts, and transformations in this repository were implemented independently using the AdventureWorks dataset.
 
 ---
 
