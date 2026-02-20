@@ -177,11 +177,10 @@ In progress. The project is developed incrementally with a clear phased approach
 
 Current focus:
 
-- Setting up the database environment, exploring the AdventureWorks source schema, and defining the first warehouse model.
+- Setting up bronze ingestion pipeline
 
 Planned next steps:
-
-- Bronze ingestion pipeline  
+ 
 - Silver cleansing and standardization logic  
 - Gold dimensional model implementation 
 - Implement KPI queries in SQL (Analytics scripts)  
