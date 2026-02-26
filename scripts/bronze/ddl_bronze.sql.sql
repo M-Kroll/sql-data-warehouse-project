@@ -5,14 +5,20 @@ DDL Script: Create Bronze Tables
 
 ddl_bronze.sql
 
-Script Purpose:
-This script creates the tables in the 'bronze' schema. It defines tables in a structure closely aligned with the original source 
-according to the 'AdventureWorks Database Dictionary'.The tables include primary keys and proper data types to maintain basic data integrity 
-while remaining raw and untransformed.
+Purpose:
+Creates tables in the 'bronze' schema to store raw source data.
+
+The Bronze layer prioritizes reliable ingestion of CSV data.
+Columns are intentionally defined with flexible NVARCHAR types 
+and permissive NULL settings to avoid load failures caused by 
+format inconsistencies or non-standard NULL values.
+
+Strict data typing, validation, and transformations are deferred 
+to downstream layers (e.g., Silver layer).
 
 WARNING:
-Running this script will **drop existing Bronze tables** if they already exist in the database. 
-All existing data in these tables will be permanently lost. Ensure you have backups or are operating in a safe test environment.
+Running this script will drop existing Bronze tables.
+All data in those tables will be permanently lost.
 */
 
 -- Drop (if already exists) and (re)create table from source_person
@@ -22,20 +28,19 @@ IF OBJECT_ID('bronze.person_person', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.person_person (
-    BusinessEntityID INT NOT NULL,
-    PersonType NCHAR(2) NOT NULL,
-    NameStyle BIT NOT NULL,
-    Title NVARCHAR(8) NULL,
-    FirstName NVARCHAR(50) NOT NULL,
-    MiddleName NVARCHAR(50) NULL,
-    LastName NVARCHAR(50) NOT NULL,
-    Suffix NVARCHAR(10) NULL,
-    EmailPromotion INT NOT NULL,
-    AdditionalContactInfo NVARCHAR(MAX) NULL, -- Changed original XML datatype to NVARCHAR(MAX) due to CSV import characteristics
+    BusinessEntityID NVARCHAR(20) NULL,
+    PersonType NVARCHAR(10) NULL,
+    NameStyle NVARCHAR(5) NULL,
+    Title NVARCHAR(50) NULL,
+    FirstName NVARCHAR(100) NULL,
+    MiddleName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL,
+    Suffix NVARCHAR(20) NULL,
+    EmailPromotion NVARCHAR(10) NULL,
+    AdditionalContactInfo NVARCHAR(MAX) NULL, -- Changed to NVARCHAR(MAX) due to original XML datatype
     Demographics NVARCHAR(MAX) NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_person_person PRIMARY KEY (BusinessEntityID)
+    rowguid NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
 
@@ -46,32 +51,31 @@ IF OBJECT_ID('bronze.production_product', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.production_product (
-    ProductID INT NOT NULL,
-    Name NVARCHAR(50) NOT NULL,
-    ProductNumber NVARCHAR(25) NOT NULL,
-    MakeFlag BIT NOT NULL,
-    FinishedGoodsFlag BIT NOT NULL,
-    Color NVARCHAR(15) NULL,
-    SafetyStockLevel SMALLINT NOT NULL,
-    ReorderPoint SMALLINT NOT NULL,
-    StandardCost MONEY NOT NULL,
-    ListPrice MONEY NOT NULL,
-    Size NVARCHAR (5) NULL,
-    SizeUnitMeasureCode NCHAR(5) NULL,
-    WeightUnitMeasureCode NCHAR (3) NULL,
-    Weight DECIMAL(8,2) NULL,
-    DaysToManufacture INT NOT NULL,
-    ProductLine NCHAR(2) NULL,
-    Class NCHAR(2) NULL,
-    Style NCHAR(2) NULL,
-    ProductSubcategoryID INT NULL,
-    ProductModelID INT NULL,
-    SellStartDate DATETIME NOT NULL,
-    SellEndDate DATETIME NULL,
-    DiscontinuedDate DATETIME NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_production_product PRIMARY KEY (ProductID)
+    ProductID NVARCHAR(20) NULL,
+    Name NVARCHAR(100) NULL,
+    ProductNumber NVARCHAR(50) NULL,
+    MakeFlag NVARCHAR(5) NULL,
+    FinishedGoodsFlag NVARCHAR(5) NULL,
+    Color NVARCHAR(30) NULL,
+    SafetyStockLevel NVARCHAR(20) NULL,
+    ReorderPoint NVARCHAR(20) NULL,
+    StandardCost NVARCHAR(50) NULL,
+    ListPrice NVARCHAR(50) NULL,
+    Size NVARCHAR (10) NULL,
+    SizeUnitMeasureCode NVARCHAR(10) NULL,
+    WeightUnitMeasureCode NVARCHAR (10) NULL,
+    Weight NVARCHAR(50) NULL,
+    DaysToManufacture NVARCHAR(50) NULL,
+    ProductLine NVARCHAR(10) NULL,
+    Class NVARCHAR(10) NULL,
+    Style NVARCHAR(10) NULL,
+    ProductSubcategoryID NVARCHAR(20) NULL,
+    ProductModelID NVARCHAR(20) NULL,
+    SellStartDate NVARCHAR(50) NULL,
+    SellEndDate NVARCHAR(50) NULL,
+    DiscontinuedDate NVARCHAR(50) NULL,
+    rowguid NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
 
@@ -80,11 +84,10 @@ IF OBJECT_ID('bronze.production_productcategory', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.production_productcategory (
-    ProductCategoryID INT NOT NULL,
-    Name NVARCHAR(50) NOT NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_production_productcategory PRIMARY KEY (ProductCategoryID)
+    ProductCategoryID NVARCHAR(50) NULL,
+    Name NVARCHAR(100) NULL,
+    rowguid NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(100) NULL
 );
 GO
 
@@ -93,12 +96,11 @@ IF OBJECT_ID('bronze.production_productsubcategory', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.production_productsubcategory (
-    ProductSubcategoryID INT NOT NULL,
-    ProductCategoryID INT NOT NULL,
-    Name NVARCHAR(50) NOT NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_production_productsubcategory PRIMARY KEY (ProductSubcategoryID)
+    ProductSubcategoryID NVARCHAR(50) NULL,
+    ProductCategoryID NVARCHAR(50) NULL,
+    Name NVARCHAR(100) NULL,
+    rowguid NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
 
@@ -109,14 +111,13 @@ IF OBJECT_ID('bronze.sales_customer', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.sales_customer (
-    CustomerID INT NOT NULL,
-    PersonID INT NULL,
-    StoreID INT NULL,
-    TerritoryID INT NULL,
-    AccountNumber VARCHAR(10) NOT NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_sales_customer PRIMARY KEY (CustomerID)
+    CustomerID NVARCHAR(20) NULL,
+    PersonID NVARCHAR(20) NULL,
+    StoreID NVARCHAR(20) NULL,
+    TerritoryID NVARCHAR(20) NULL,
+    AccountNumber VARCHAR(20) NULL,
+    rowguid NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
 
@@ -125,18 +126,17 @@ IF OBJECT_ID('bronze.sales_salesorderdetail', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.sales_salesorderdetail (
-    SalesOrderID INT NOT NULL,
-    SalesOrderDetailID INT NOT NULL,
-    CarrierTrackingNumber NVARCHAR(25) NULL,
-    OrderQty SMALLINT NOT NULL,
-    ProductID INT NOT NULL,
-    SpecialOfferID INT NOT NULL,
-    UnitPrice MONEY NOT NULL,
-    UnitPriceDiscount MONEY NOT NULL,
-    LineTotal NUMERIC(38,6) NOT NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL, 
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_sales_salesorderdetail PRIMARY KEY (SalesOrderID, SalesOrderDetailID) -- Note: Two columns as primary key
+    SalesOrderID NVARCHAR(20) NULL,
+    SalesOrderDetailID NVARCHAR(20) NULL,
+    CarrierTrackingNumber NVARCHAR(50) NULL,
+    OrderQty NVARCHAR(20) NULL,
+    ProductID NVARCHAR(20) NULL,
+    SpecialOfferID NVARCHAR(20) NOT NULL,
+    UnitPrice NVARCHAR(50) NULL,
+    UnitPriceDiscount NVARCHAR(50) NULL,
+    LineTotal NVARCHAR(100) NULL,
+    rowguid NVARCHAR(50) NULL, 
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
 
@@ -145,33 +145,32 @@ IF OBJECT_ID('bronze.sales_salesorderheader', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.sales_salesorderheader (
-    SalesOrderID INT NOT NULL,
-    RevisionNumber TINYINT NOT NULL,
-    OrderDate DATETIME NOT NULL,
-    DueDate DATETIME NOT NULL,
-    ShipDate DATETIME NULL,
-    Status TINYINT NOT NULL,
-    OnlineOrderFlag BIT NOT NULL,
-    SalesOrderNumber NVARCHAR(25) NOT NULL,
-    PurchaseOrderNumber NVARCHAR(25) NULL,
-    AccountNumber NVARCHAR(15) NULL,
-    CustomerID INT NOT NULL,
-    SalesPersonID INT NULL,
-    TerritoryID INT NULL,
-    BillToAddressID INT NOT NULL,
-    ShipToAddressID INT NOT NULL,
-    ShipMethodID INT NOT NULL,
-    CreditCardID INT NULL,
-    CreditCardApprovalCode VARCHAR(15) NULL,
-    CurrencyRateID INT NULL,
-    SubTotal MONEY NOT NULL,
-    TaxAmt MONEY NOT NULL,
-    Freight MONEY NOT NULL,
-    TotalDue MONEY NOT NULL,
-    Comment NVARCHAR(128) NULL,
-    rowguid UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_sales_salesorderheader PRIMARY KEY (SalesOrderID)
+    SalesOrderID NVARCHAR(20) NULL,
+    RevisionNumber NVARCHAR(20) NULL,
+    OrderDate NVARCHAR(50) NULL,
+    DueDate NVARCHAR(50) NULL,
+    ShipDate NVARCHAR(50) NULL,
+    Status NVARCHAR(20) NULL,
+    OnlineOrderFlag NVARCHAR(5) NULL,
+    SalesOrderNumber NVARCHAR(50) NULL,
+    PurchaseOrderNumber NVARCHAR(50) NULL,
+    AccountNumber NVARCHAR(50) NULL,
+    CustomerID NVARCHAR(20) NULL,
+    SalesPersonID NVARCHAR(20) NULL,
+    TerritoryID NVARCHAR(20) NULL,
+    BillToAddressID NVARCHAR(20) NULL,
+    ShipToAddressID NVARCHAR(20) NULL,
+    ShipMethodID NVARCHAR(20) NULL,
+    CreditCardID NVARCHAR(20) NULL,
+    CreditCardApprovalCode NVARCHAR(50) NULL,
+    CurrencyRateID NVARCHAR(20) NULL,
+    SubTotal NVARCHAR(50)NULL,
+    TaxAmt NVARCHAR(50) NULL,
+    Freight NVARCHAR(50) NULL,
+    TotalDue NVARCHAR(20) NULL,
+    Comment NVARCHAR(200) NULL,
+    rowguid NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
 
@@ -180,16 +179,15 @@ IF OBJECT_ID('bronze.sales_salesterritory', 'U') IS NOT NULL
 GO
 
 CREATE TABLE bronze.sales_salesterritory (
-    TerritoryID INT NOT NULL,
-    Name NVARCHAR(50) NOT NULL,
-    CountryRegionCode NVARCHAR(3) NOT NULL,
-    [Group] NVARCHAR(50) NOT NULL,  -- Renamed column name from 'Group' to '[Group]' due to error with SQL 'Group' syntax
-    SalesYTD MONEY NOT NULL,
-    SalesLastYear MONEY NOT NULL,
-    CostYTD MONEY NOT NULL,
-    CostLastYear MONEY NOT NULL,
-    rowguid	UNIQUEIDENTIFIER NOT NULL,
-    ModifiedDate DATETIME NOT NULL,
-    CONSTRAINT pk_sales_salesterritory PRIMARY KEY (TerritoryID)
+    TerritoryID NVARCHAR(20) NULL,
+    Name NVARCHAR(100) NULL,
+    CountryRegionCode NVARCHAR(10) NULL,
+    [Group] NVARCHAR(100) NULL,  -- Renamed column name from 'Group' to '[Group]' due to error with SQL 'Group' syntax
+    SalesYTD NVARCHAR(50) NULL,
+    SalesLastYear NVARCHAR(50) NULL,
+    CostYTD NVARCHAR(50) NULL,
+    CostLastYear NVARCHAR(50) NULL,
+    rowguid	NVARCHAR(50) NULL,
+    ModifiedDate NVARCHAR(50) NULL
 );
 GO
