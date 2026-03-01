@@ -27,115 +27,166 @@ downstream layers (e.g., Silver layer).
 
 CREATE OR ALTER PROCEDURE bronze.load_bronze AS
 BEGIN
-	PRINT '==================================================';
-	PRINT 'Loading Bronze Layer';
-	PRINT '==================================================';
+	DECLARE @start_time DATETIME, @end_time DATETIME, @batch_start_time DATETIME, @batch_end_time DATETIME;
+	BEGIN TRY
+		SET @batch_start_time = GETDATE();
+		PRINT '==================================================';
+		PRINT 'Loading Bronze Layer';
+		PRINT '==================================================';
 	
-	PRINT '--------------------------------------------------';
-	PRINT 'Loading tables from source_person origin folder';
-	PRINT '--------------------------------------------------';
+		PRINT '--------------------------------------------------';
+		PRINT 'Loading tables from source_person origin folder';
+		PRINT '--------------------------------------------------';
 
-	PRINT '>> Truncating table: bronze.person_person';
-	TRUNCATE TABLE bronze.person_person;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.person_person';
+		TRUNCATE TABLE bronze.person_person;
 
-	PRINT '>> Inserting data into: bronze.person_person';
-	BULK INSERT bronze.person_person
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_person\person.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.person_person';
+		BULK INSERT bronze.person_person
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_person\person.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '--------------------------------------------------';
-	PRINT 'Loading tables from source_production origin folder';
-	PRINT '--------------------------------------------------';
+		PRINT '--------------------------------------------------';
+		PRINT 'Loading tables from source_production origin folder';
+		PRINT '--------------------------------------------------';
 
-	PRINT '>> Truncating table: bronze.production_product';
-	TRUNCATE TABLE bronze.production_product;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.production_product';
+		TRUNCATE TABLE bronze.production_product;
 
-	PRINT '>> Inserting data into: bronze.production_product';
-	BULK INSERT bronze.production_product
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_production\product.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.production_product';
+		BULK INSERT bronze.production_product
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_production\product.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '>> Truncating table: bronze.production_productcategory';
-	TRUNCATE TABLE bronze.production_productcategory;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.production_productcategory';
+		TRUNCATE TABLE bronze.production_productcategory;
 
-	PRINT '>> Inserting data into: bronze.production_productcategory';
-	BULK INSERT bronze.production_productcategory
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_production\productcategory.csv' 
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.production_productcategory';
+		BULK INSERT bronze.production_productcategory
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_production\productcategory.csv' 
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '>> Truncating table: bronze.production_productsubcategory';
-	TRUNCATE TABLE bronze.production_productsubcategory;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.production_productsubcategory';
+		TRUNCATE TABLE bronze.production_productsubcategory;
 
-	PRINT '>> Inserting data into: bronze.production_productsubcategory';
-	BULK INSERT bronze.production_productsubcategory
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_production\productsubcategory.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.production_productsubcategory';
+		BULK INSERT bronze.production_productsubcategory
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_production\productsubcategory.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '--------------------------------------------------';
-	PRINT 'Loading tables from source_sales origin folder';
-	PRINT '--------------------------------------------------';
+		PRINT '--------------------------------------------------';
+		PRINT 'Loading tables from source_sales origin folder';
+		PRINT '--------------------------------------------------';
 
-	PRINT '>> Truncating table: bronze.sales_customer';
-	TRUNCATE TABLE bronze.sales_customer;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.sales_customer';
+		TRUNCATE TABLE bronze.sales_customer;
 	
-	PRINT '>> Inserting data into: bronze.sales_customer';
-	BULK INSERT bronze.sales_customer
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\customer.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.sales_customer';
+		BULK INSERT bronze.sales_customer
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\customer.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '>> Truncating table: bronze.sales_salesorderdetail';
-	TRUNCATE TABLE bronze.sales_salesorderdetail;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.sales_salesorderdetail';
+		TRUNCATE TABLE bronze.sales_salesorderdetail;
 
-	PRINT '>> Inserting data into: bronze.sales_salesorderdetail';
-	BULK INSERT bronze.sales_salesorderdetail
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\salesorderdetail.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.sales_salesorderdetail';
+		BULK INSERT bronze.sales_salesorderdetail
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\salesorderdetail.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '>> Truncating table: bronze.sales_salesorderheader';
-	TRUNCATE TABLE bronze.sales_salesorderheader;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.sales_salesorderheader';
+		TRUNCATE TABLE bronze.sales_salesorderheader;
 
-	PRINT '>> Inserting data into: bronze.sales_salesorderheader';
-	BULK INSERT bronze.sales_salesorderheader
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\salesorderheader.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.sales_salesorderheader';
+		BULK INSERT bronze.sales_salesorderheader
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\salesorderheader.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
 
-	PRINT '>> Truncating table: bronze.sales_salesterritory';
-	TRUNCATE TABLE bronze.sales_salesterritory;
+		SET @start_time = GETDATE();
+		PRINT '>> Truncating table: bronze.sales_salesterritory';
+		TRUNCATE TABLE bronze.sales_salesterritory;
 
-	PRINT '>> Inserting data into: bronze.sales_salesterritory';
-	BULK INSERT bronze.sales_salesterritory
-	FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\salesterritory.csv'
-	WITH (
-		FIRSTROW = 2,
-		FIELDTERMINATOR = ';',
-		TABLOCK
-	);
+		PRINT '>> Inserting data into: bronze.sales_salesterritory';
+		BULK INSERT bronze.sales_salesterritory
+		FROM 'C:\sql\sql-data-warehouse-project\datasets\source_sales\salesterritory.csv'
+		WITH (
+			FIRSTROW = 2,
+			FIELDTERMINATOR = ';',
+			TABLOCK
+		);
+		SET @end_time = GETDATE();
+		PRINT '>> Load duration: ' + CAST(DATEDIFF(second, @start_time, @end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '--------------------'
+
+		SET @batch_end_time = GETDATE();
+		PRINT '==================================================';
+		PRINT 'Loading bronze layer is completed';
+		PRINT '   - Total load duration: ' + CAST(DATEDIFF(second, @batch_start_time, @batch_end_time) AS NVARCHAR) + ' seconds.';
+		PRINT '==================================================';
+	END TRY
+	
+	BEGIN CATCH
+		PRINT '==================================================';
+		PRINT 'ERROR OCCURED DURING LOADING BRONZE LAYER';
+		PRINT 'Error Message' + ERROR_MESSAGE();
+		PRINT 'Error Message' + CAST (ERROR_NUMBER() AS NVARCHAR);
+		PRINT 'Error Message' + CAST (ERROR_STATE() AS NVARCHAR);
+		PRINT '==================================================';
+	END CATCH
 END
