@@ -31,10 +31,11 @@ data-warehouse-project/
 ├── datasets/                           # Raw datasets used for the project 
 │
 ├── docs/                               # Documentation, architecture and modeling
-│   ├── data_architecture.pnd           # Bronze/Silver/Gold architecture diagram
-│   ├── data_flow.png                   # ETL and data flow documentation
-│   ├── data_models.png                 # Star schema / dimensional model
+│   ├── data_architecture.png           # Bronze/Silver/Gold architecture diagram
 │   ├── data_catalog.md                 # Dataset catalog with column descriptions
+│   ├── data_flow.png                   # ETL and data flow documentation
+│   ├── data_integration.png            # How are tables related to each other
+│   ├── data_models.png                 # Star schema / dimensional model
 │   ├── naming_conventions.md           # Naming rules for schemas, tables and columns
 │
 ├── scripts/                            # SQL scripts for ETL and transformations
@@ -177,11 +178,10 @@ In progress. The project is developed incrementally with a clear phased approach
 
 Current focus:
 
-- Setting up bronze ingestion pipeline
+- Silver cleansing and standardization logic  
 
 Planned next steps:
  
-- Silver cleansing and standardization logic  
 - Gold dimensional model implementation 
 - Implement KPI queries in SQL (Analytics scripts)  
 - Add documentation of key business metrics  
